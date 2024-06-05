@@ -1,11 +1,13 @@
-import { useRef } from 'react';
+import { memo, useRef } from 'react';
 import { IToDoItem } from '../toDoItem/toDoItem';
+import styles from './newToDoItem.module.scss';
+import { v4 as uuidv4 } from 'uuid';
 
 export interface INewToDoItemProps {
   addItem: (toDo: IToDoItem) => void;
 }
 
-export const NewToDoItem = ({ addItem }: INewToDoItemProps) => {
+export const NewToDoItem = memo(({ addItem }: INewToDoItemProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const createNewItem = () => {
@@ -14,17 +16,20 @@ export const NewToDoItem = ({ addItem }: INewToDoItemProps) => {
     }
 
     const toDo: IToDoItem = {
-      initialCompleted: false,
+      completed: false,
       title: inputRef.current.value,
+      id: uuidv4(),
     };
 
     addItem(toDo);
   };
 
   return (
-    <div>
-      <input type="text" ref={inputRef} />
-      <button onClick={createNewItem}>Add todo</button>
+    <div data-test={'NewToDoItem'} className={styles.wrapper}>
+      <input className={styles.input} type="text" ref={inputRef} />
+      <button className={styles.button} onClick={createNewItem}>
+        Add todo
+      </button>
     </div>
   );
-};
+});

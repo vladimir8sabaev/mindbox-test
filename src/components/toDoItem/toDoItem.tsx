@@ -1,24 +1,40 @@
-import { memo, useState } from 'react';
+import { Dispatch, SetStateAction, memo } from 'react';
 import styles from './toDoItem.module.scss';
 import clsx from 'clsx';
 
 export interface IToDoItem {
   title: string;
-  initialCompleted: boolean;
+  completed: boolean;
+  id: string;
 }
 
-export const ToDoItem = ({ initialCompleted, title }: IToDoItem) => {
-  const [completed, setCompleted] = useState(initialCompleted);
+export interface IToDoItemProps extends IToDoItem {
+  setItems: Dispatch<SetStateAction<IToDoItem[]>>;
+}
 
-  return (
-    <li
-      onClick={() => setCompleted((check) => !check)}
-      className={clsx([styles.item, completed && styles.checked])}
-    >
-      <input type="checkbox" checked={completed} />
-      <p>{title}</p>
-    </li>
-  );
-};
+export const ToDoItem = memo(
+  ({ completed, title, setItems, id }: IToDoItemProps) => {
+    const toggleCompleted = () => {
+      setItems((items) => {
+        const newItems = items.map((item) => {
+          if (item.id === id) {
+            return { ...item, completed: !item.completed };
+          }
+          return item;
+        });
+        return newItems;
+      });
+    };
 
-export const MemoItem = memo(ToDoItem);
+    return (
+      <li
+        data-test={'ToDoItem'}
+        onClick={toggleCompleted}
+        className={clsx([styles.item, completed && styles.checked])}
+      >
+        <input onChange={() => 1} type="checkbox" checked={completed} />
+        <p>{title}</p>
+      </li>
+    );
+  }
+);
